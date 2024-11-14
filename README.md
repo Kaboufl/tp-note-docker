@@ -15,7 +15,7 @@ Voici un détail de la séquence de démarrage (une étape est complétée quand
 2. Démarrage du backend
 3. Application des migrations
 4. Démarrage de PHPmyAdmin
-5. Démmarage du frontend
+5. Démarage du frontend
 6. Démarrage du reverse proxy
 
 ## Lancer l'application
