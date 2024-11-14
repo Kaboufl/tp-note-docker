@@ -1,0 +1,8 @@
+services:
+  backend:
+    build:
+      context: ./sources/backend/
+      dockerfile: Dockerfile
+    environment: 
+      - FLASK_APP=application.py
+
