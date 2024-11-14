@@ -12,4 +12,3 @@ COPY . .
 EXPOSE 8080
 
 CMD ["waitress-serve", "--host", "0.0.0.0", "--call", "flaskr:create_app"]
-# CMD ["flask", "run"]

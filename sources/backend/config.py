@@ -24,7 +24,7 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     # Flask sqlalchemy
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "data.db")
+    SQLALCHEMY_DATABASE_URI = (f"mysql+pymysql://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}/{os.getenv('DB_DATABASE')}")
     # Flask jwt extended
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
 

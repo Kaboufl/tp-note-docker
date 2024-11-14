@@ -5,4 +5,110 @@ services:
       dockerfile: Dockerfile
     environment: 
       - FLASK_APP=application.py
+      - DB_HOST=${DB_HOST}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - todo-app
+    depends_on:
+      bdd:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/docs"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
+  bdd:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    networks:
+      - todo-app
+    volumes:
+      - todo-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 10
+      timeout: 10s
+      interval: 5s
+
+  migrate:
+    build:
+      context: ./sources/backend
+      dockerfile: Dockerfile
+    command: flask db upgrade
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - todo-app
+    depends_on:
+      bdd:
+        condition: service_healthy
+
+  pma:
+    image: phpmyadmin
+    ports:
+      - 8080:80
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - PMA_HOST=${DB_HOST}
+      - PMA_USER=${DB_USERNAME}
+      - PMA_PASSWORD=${DB_PASSWORD}
+    networks:
+      - todo-app
+    depends_on:
+      bdd:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+  frontend:
+    build:
+      context: ./sources/frontend
+      dockerfile: Dockerfile
+    networks:
+      - todo-app
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      retries: 10
+      timeout: 10s
+      interval: 5s
+
+  reverse_proxy:
+    build:
+      context: ./sources/nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    networks:
+      - todo-app
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      retries: 10
+      timeout: 10s
+      interval: 5s
+
+volumes:
+  todo-db:
+
+networks:
+  todo-app:
+    driver: bridge
