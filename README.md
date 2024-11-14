@@ -4,7 +4,19 @@ Le but est de conteneuriser une application avec un frontend en React, un backen
 
 Voici un diagramme résumant la structure des différents services de l'application :
 
-![diagramme de la stack de l'application](http://url/to/img.png)
+![diagramme de la stack de l'application](https://github.com/Kaboufl/tp-note-docker/blob/main/docs/diagramme.png)
+
+## Gestion des états des différents services
+
+L'application a besoin d'avoir une base de données fonctionnelle ainsi que d'un backend connectée de manière effective à celle ci. C'est pour cela qu'un contrôle de l'état des conteneurs a été mis en place et segmente la mise en route de la pile de conteneurs.
+
+Voici un détail de la séquence de démarrage (une étape est complétée quand le contrôle du fonctionnement du conteneur a été validé) :
+1. Démarrage de la base de données
+2. Démarrage du backend
+3. Application des migrations
+4. Démarrage de PHPmyAdmin
+5. Démmarage du frontend
+6. Démarrage du reverse proxy
 
 ## Lancer l'application
 
